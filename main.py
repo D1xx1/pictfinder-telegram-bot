@@ -7,10 +7,6 @@ from icrawler.builtin import GoogleImageCrawler
 
 bot = telebot.TeleBot(token)
 
-prevDir = os.getcwd()
-
-print(prevDir)
-
 @bot.message_handler()
 def commandBot(message):
     chat_id = message.from_user.id
