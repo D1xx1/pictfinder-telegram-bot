@@ -1,11 +1,15 @@
+import datetime
 import telebot
 import random
 import os
-import shutil
 from settings import token, quantity
 from icrawler.builtin import GoogleImageCrawler
 
 bot = telebot.TeleBot(token)
+
+prevDir = os.getcwd()
+
+print(prevDir)
 
 @bot.message_handler()
 def commandBot(message):
@@ -15,7 +19,6 @@ def commandBot(message):
     else:
         try:
             command = message.text
-            
             os.mkdir(f'{chat_id}')
             bot.send_message(chat_id, 'Идёт поиск изображения')
             directory = f'{os.getcwd()}\{chat_id}'
@@ -26,8 +29,13 @@ def commandBot(message):
                 files = {'photo':photo}
                 bot.send_photo(chat_id, photo, reply_to_message_id=message.id)
             print(files)
-            shutil.rmtree(f'{chat_id}')
-        except FileExistsError:    
+            today = datetime.datetime.today()
+            newName = f'{chat_id}_{today.strftime(f"%Y-%m-%d-%H.%M.%S")}_{command}'
+            os.rename(f'{chat_id}', newName)
+            if not os.path.isdir('History'):
+                os.mkdir('History')
+            os.replace(newName, f'History/{newName}')
+        except FileExistsError:
             bot.send_message(chat_id, 'Пожалуйста, дождитесь окончания прошлого поиска.')
             bot.register_next_step_handler_by_chat_id(chat_id, commandBot)
         
